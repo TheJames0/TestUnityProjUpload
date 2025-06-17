@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const path = require('path');
 const express = require('express');
 
 // Create express application
@@ -12,19 +13,19 @@ const enableWasmMultithreading = true;
 
 
 // Serve the current working directory 
-const unityBuildPath = __dirname + '/Build'; // Note: this makes the current working directory visible to all computers over the network.
+const unityBuildPath = __dirname; // Note: this makes the current working directory visible to all computers over the network.
 
 app.use((req, res, next) => {
-    const requestPath = req.path;
+    var path = req.url;
 
     // Provide COOP, COEP and CORP headers for SharedArrayBuffer
     // multithreading: https://web.dev/coop-coep/
     if (enableWasmMultithreading &&
         (
-            requestPath == '/' ||
-            requestPath.includes('.js') ||
-            requestPath.includes('.html') ||
-            requestPath.includes('.htm')
+            path == '/' ||
+            path.includes('.js') ||
+            path.includes('.html') ||
+            path.includes('.htm')
         )
     ) {
         res.set('Cross-Origin-Opener-Policy', 'same-origin');
@@ -38,23 +39,23 @@ app.use((req, res, next) => {
     }
 
     // Set content encoding depending on compression
-    if (requestPath.endsWith('.br')) {
+    if (path.endsWith('.br')) {
         res.set('Content-Encoding', 'br');
-    } else if (requestPath.endsWith('.gz')) {
+    } else if (path.endsWith('.gz')) {
         res.set('Content-Encoding', 'gzip');
     }
 
     // Explicitly set content type. Files can have wrong content type if build uses compression.
-    if (requestPath.includes('.wasm')) {
+    if (path.includes('.wasm')) {
         res.set('Content-Type', 'application/wasm');
-    } else if (requestPath.includes('.js')) {
+    } else if (path.includes('.js')) {
         res.set('Content-Type', 'application/javascript');
-    } else if (requestPath.includes('.json')) {
+    } else if (path.includes('.json')) {
         res.set('Content-Type', 'application/json');
     } else if (
-        requestPath.includes('.data') ||
-        requestPath.includes('.bundle') ||
-        requestPath.endsWith('.unityweb')
+        path.includes('.data') ||
+        path.includes('.bundle') ||
+        path.endsWith('.unityweb')
     ) {
         res.set('Content-Type', 'application/octet-stream');
     }
@@ -73,6 +74,7 @@ app.use((req, res, next) => {
 
     next();
 });
+
 app.use('/', express.static(unityBuildPath, { immutable: true }));
 
 const server = app.listen(port, hostname, () => {
