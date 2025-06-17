@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-const path = require('path');
 const express = require('express');
 
 // Create express application
@@ -16,16 +15,16 @@ const enableWasmMultithreading = true;
 const unityBuildPath = __dirname + '/Build'; // Note: this makes the current working directory visible to all computers over the network.
 
 app.use((req, res, next) => {
-    var path = req.url;
+    const requestPath = req.path;
 
     // Provide COOP, COEP and CORP headers for SharedArrayBuffer
     // multithreading: https://web.dev/coop-coep/
     if (enableWasmMultithreading &&
         (
-            path == '/' ||
-            path.includes('.js') ||
-            path.includes('.html') ||
-            path.includes('.htm')
+            requestPath == '/' ||
+            requestPath.includes('.js') ||
+            requestPath.includes('.html') ||
+            requestPath.includes('.htm')
         )
     ) {
         res.set('Cross-Origin-Opener-Policy', 'same-origin');
@@ -39,23 +38,23 @@ app.use((req, res, next) => {
     }
 
     // Set content encoding depending on compression
-    if (path.endsWith('.br')) {
+    if (requestPath.endsWith('.br')) {
         res.set('Content-Encoding', 'br');
-    } else if (path.endsWith('.gz')) {
+    } else if (requestPath.endsWith('.gz')) {
         res.set('Content-Encoding', 'gzip');
     }
 
     // Explicitly set content type. Files can have wrong content type if build uses compression.
-    if (path.includes('.wasm')) {
+    if (requestPath.includes('.wasm')) {
         res.set('Content-Type', 'application/wasm');
-    } else if (path.includes('.js')) {
+    } else if (requestPath.includes('.js')) {
         res.set('Content-Type', 'application/javascript');
-    } else if (path.includes('.json')) {
+    } else if (requestPath.includes('.json')) {
         res.set('Content-Type', 'application/json');
     } else if (
-        path.includes('.data') ||
-        path.includes('.bundle') ||
-        path.endsWith('.unityweb')
+        requestPath.includes('.data') ||
+        requestPath.includes('.bundle') ||
+        requestPath.endsWith('.unityweb')
     ) {
         res.set('Content-Type', 'application/octet-stream');
     }
@@ -74,7 +73,6 @@ app.use((req, res, next) => {
 
     next();
 });
-
 app.use('/', express.static(unityBuildPath, { immutable: true }));
 
 const server = app.listen(port, hostname, () => {
