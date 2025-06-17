@@ -13,7 +13,7 @@ const enableWasmMultithreading = true;
 
 
 // Serve the current working directory 
-const unityBuildPath = __dirname; // Note: this makes the current working directory visible to all computers over the network.
+const unityBuildPath = __dirname + '/Build'; // Note: this makes the current working directory visible to all computers over the network.
 
 app.use((req, res, next) => {
     var path = req.url;
