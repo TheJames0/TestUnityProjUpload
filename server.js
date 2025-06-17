@@ -1,12 +1,13 @@
 #!/usr/bin/env node
+const path = require('path');
 const express = require('express');
 
 // Create express application
 const app = express();
 
 // Settings
-const hostname = 'https://testunityprojupload.onrender.com'; // This is the intended public URL
-const port = process.env.PORT || 8080; // Use port from environment variable for Render, default to 8080
+const hostname = 'localhost';
+const port = 8080;
 const enableCORS = true;
 const enableWasmMultithreading = true;
 
@@ -75,15 +76,13 @@ app.use((req, res, next) => {
 });
 
 app.use('/', express.static(unityBuildPath, { immutable: true }));
-app.use('/', express.static(unityBuildPath, { immutable: true }));
 
-const server = app.listen(port, '0.0.0.0', () => { // Listen on 0.0.0.0 for Render compatibility
-    console.log(`Web server serving directory ${unityBuildPath}`);
-    console.log(`Listening on port ${port}`);
-    console.log(`Access your application at ${hostname} (if deployed) or http://localhost:${port} (for local development)`);
+const server = app.listen(port, hostname, () => {
+    console.log(`Web server serving directory ${unityBuildPath} at http://${hostname}:${port}`);
 });
 
 server.addListener('error', (error) => {
+    console.error(error);
 });
 
 server.addListener('close', () => {
