@@ -6,7 +6,7 @@ const express = require('express');
 const app = express();
 
 // Settings
-const hostname = '192.168.1.35';
+const hostname = 'https://testunityprojupload.onrender.com';
 const port = 8080;
 const enableCORS = true;
 const enableWasmMultithreading = true;
