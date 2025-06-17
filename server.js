@@ -6,7 +6,7 @@ const express = require('express');
 const app = express();
 
 // Settings
-const hostname = 'localhost';
+const hostname = 'test-unity-proj-upload.vercel.app';
 const port = 8080;
 const enableCORS = true;
 const enableWasmMultithreading = true;
